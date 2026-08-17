@@ -1,0 +1,186 @@
+﻿<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BenQ 螢幕支架相容查詢</title>
+  <link href="css/main.css" rel="stylesheet">
+</head>
+<body>
+
+<div class="BNQARM01-root" data-name="Index_Compatibility_Monitors_Arm">
+
+  <div class="BNQARM01-intro">
+    <p class="BNQARM01-intro-text">BenQ 螢幕支架採用通用 VESA 標準安裝，相容市面上多數支援 VESA 孔位的螢幕，不限定單一品牌。免工具快拆設計搭配可調式懸臂，支援升降、傾角與旋轉，依需求彈性調整螢幕高度與角度。多款支架分別對應不同承重與尺寸需求，並提供單螢幕、雙螢幕等安裝形式，滿足各種使用情境。</p>
+    <p class="BNQARM01-intro-text">本文列出各支架規格、相容判斷方式，以及依規格數據比對確認相容的螢幕品牌型號，協助你快速確認手邊螢幕是否適用。</p>
+  </div>
+
+  <h2 class="BNQARM01-heading BNQARM01-heading-spec">1、BenQ螢幕支架的規格</h2>
+
+  <section class="BNQARM01-table-section" aria-label="螢幕支架規格表">
+    <div class="BNQARM01-table-wrap">
+      <table class="BNQARM01-table">
+        <thead>
+          <tr>
+            <th scope="col">支架</th>
+            <th scope="col">適用尺寸</th>
+            <th scope="col">承重</th>
+            <th scope="col">VESA規格</th>
+            <th scope="col">支援螢幕數</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="BNQARM01-table-model">BSH01</td>
+            <td>22 - 24 吋</td>
+            <td>2 - 20 Kg</td>
+            <td>75x75 / 100x100</td>
+            <td>單螢幕</td>
+          </tr>
+          <tr>
+            <td class="BNQARM01-table-model">BSH02</td>
+            <td>22 - 45 吋</td>
+            <td>2 - 20 Kg</td>
+            <td>75x75 / 100x100</td>
+            <td>單螢幕</td>
+          </tr>
+          <tr>
+            <td class="BNQARM01-table-model">BDH01</td>
+            <td>17 - 35 吋 (每螢幕)</td>
+            <td>2 - 20 Kg (每螢幕)</td>
+            <td>75x75 / 100x100</td>
+            <td>雙螢幕</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <h2 class="BNQARM01-heading">2、我的螢幕可以裝BenQ支架嗎？</h2>
+
+  <div class="BNQARM01-guide">
+    <p class="BNQARM01-guide-text">判斷螢幕與支架可先從以下兩個條件是否符合，就能安裝 BenQ 螢幕支架：</p>
+    <ol class="BNQARM01-guide-list">
+      <li>螢幕背面孔位符合 VESA 75x75 或 100x100 標準</li>
+      <li>螢幕重量落在支架承重範圍內</li>
+    </ol>
+  </div>
+
+  <section class="BNQARM01-search-section" aria-label="相容查詢">
+    <p class="BNQARM01-search-lead">請選擇您的產品資訊，以下品牌與型號皆已依 VESA 孔位與重量規格比對確認相容：</p>
+
+    <div class="BNQARM01-filters">
+      <div class="BNQARM01-field" id="BNQARM01-field-brand">
+        <label class="BNQARM01-field-label" for="BNQARM01-brand">品牌</label>
+        <div class="BNQARM01-select-wrap">
+          <select
+            class="BNQARM01-select"
+            id="BNQARM01-brand"
+            name="brand"
+            data-bnqarm01-role="brand"
+            aria-label="品牌"
+          >
+            <option value="">品牌</option>
+          </select>
+        </div>
+      </div>
+      <div class="BNQARM01-field BNQARM01-field-size" id="BNQARM01-field-size">
+        <label class="BNQARM01-field-label" for="BNQARM01-size">尺寸</label>
+        <div class="BNQARM01-select-wrap">
+          <select
+            class="BNQARM01-select"
+            id="BNQARM01-size"
+            name="size"
+            data-bnqarm01-role="size"
+            aria-label="尺寸"
+          >
+            <option value="">尺寸</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="BNQARM01-filters-or">OR</div>
+
+      <div class="BNQARM01-field BNQARM01-field-model" id="BNQARM01-field-model">
+        <label class="BNQARM01-field-label" for="BNQARM01-model">型號</label>
+        <div class="BNQARM01-select-wrap">
+          <select
+            class="BNQARM01-select"
+            id="BNQARM01-model"
+            name="model"
+            data-bnqarm01-role="model"
+            aria-label="型號"
+          >
+            <option value="">型號</option>
+          </select>
+        </div>
+      </div>
+
+      <button
+        type="button"
+        class="BNQARM01-reset-btn"
+        id="BNQARM01-reset"
+      >
+        Reset
+      </button>
+    </div>
+  </section>
+
+  <section
+    class="BNQARM01-results"
+    id="BNQARM01-results"
+    aria-live="polite"
+    aria-label="搜尋結果"
+  >
+    <p class="BNQARM01-result-title" id="BNQARM01-result-title">搜尋結果型號</p>
+    <p class="BNQARM01-result-hint" id="BNQARM01-result-hint" hidden>請從下方清單選擇明確型號，以查看推薦 BenQ 螢幕支架。</p>
+    <div class="BNQARM01-result-table-wrap" id="BNQARM01-result-table-wrap" hidden>
+      <table class="BNQARM01-result-table">
+        <thead>
+          <tr>
+            <th scope="col" class="BNQARM01-result-col-model" id="BNQARM01-result-th-model">型號</th>
+            <th scope="col">尺寸</th>
+            <th scope="col">承重</th>
+            <th scope="col">VESA規格</th>
+          </tr>
+        </thead>
+        <tbody id="BNQARM01-result-body"></tbody>
+      </table>
+    </div>
+    <p class="BNQARM01-result-nomatch" id="BNQARM01-result-nomatch" hidden></p>
+  </section>
+
+  <section
+    class="BNQARM01-recommend-section"
+    id="BNQARM01-recommend-section"
+    hidden
+    aria-label="推薦 BenQ 螢幕支架"
+  >
+    <p class="BNQARM01-recommend-title" id="BNQARM01-recommend-title">推薦 BenQ 螢幕支架：</p>
+    <div class="BNQARM01-recommend" id="BNQARM01-recommend"></div>
+  </section>
+
+  <section class="BNQARM01-note-section" aria-label="備註">
+    <div class="BNQARM01-note">
+      <div class="BNQARM01-note-icon-wrap">
+        <img
+          class="BNQARM01-note-icon"
+          src="img/note-icon.svg"
+          width="24"
+          height="24"
+          alt=""
+        >
+      </div>
+      <div class="BNQARM01-note-body">
+        <p class="BNQARM01-note-heading">備註</p>
+        <p class="BNQARM01-note-text">本清單根據螢幕與支架的公開規格數據整理，實際螢幕規格可能隨製造商更新而異動，請以官方 VESA 規格與螢幕重量標示為準。</p>
+        <p class="BNQARM01-note-text">未列於清單上的型號不代表不相容，只要符合上述 VESA 孔位與承重條件，同樣可以安裝，若不確定歡迎透過【客服管道】協助確認。</p>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script src="js/app.js" charset="utf-8"></script>
+</body>
+</html>
