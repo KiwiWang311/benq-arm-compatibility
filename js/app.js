@@ -12,7 +12,19 @@
   var MONITOR_CSV = DATA_BASE + "MonitorSpec.csv";
   var ARM_CSV = DATA_BASE + "BenQArmSpec.csv";
 
-  /** Marketing size labels for arm cards (aligned with page spec table) */
+  var ARM_TYPE_I18N = {
+    "zh-Hant": { single: "單螢幕", dual: "雙螢幕" },
+    zh: { single: "單螢幕", dual: "雙螢幕" },
+    en: { single: "Single monitor", dual: "Dual monitor" }
+  };
+
+  var PER_DISPLAY_I18N = {
+    "zh-Hant": " (每螢幕)",
+    zh: " (每螢幕)",
+    en: " (per display)"
+  };
+
+  /** Marketing copy for arm cards */
   var ARM_DISPLAY = {
     BSH01: {
       title: "ERGO ARM 氣壓式螢幕支架 (單臂)",
@@ -222,12 +234,56 @@
     });
   }
 
+  function pageLang() {
+    var lang = String(document.documentElement.lang || "zh-Hant").toLowerCase();
+    if (lang.indexOf("zh") === 0) {
+      return "zh-Hant";
+    }
+    if (lang.indexOf("en") === 0) {
+      return "en";
+    }
+    return "zh-Hant";
+  }
+
+  function translateArmType(armType) {
+    var map = ARM_TYPE_I18N[pageLang()] || ARM_TYPE_I18N["zh-Hant"];
+    var key = String(armType || "").toLowerCase();
+    return map[key] || armType || "—";
+  }
+
+  function perDisplaySuffix(limitsPerDisplay) {
+    var flag = String(limitsPerDisplay || "").toUpperCase();
+    if (flag !== "TRUE" && flag !== "1") {
+      return "";
+    }
+    return PER_DISPLAY_I18N[pageLang()] || PER_DISPLAY_I18N["zh-Hant"];
+  }
+
+  function formatRange(min, max, unit) {
+    if (min == null || isNaN(min) || max == null || isNaN(max)) {
+      return "—";
+    }
+    return min + " - " + max + " " + unit;
+  }
+
+  function formatArmVesa(value) {
+    var parts = String(value || "")
+      .split(";")
+      .map(function (s) {
+        return s.trim();
+      })
+      .filter(Boolean);
+    return parts.length ? parts.join(" / ") : "—";
+  }
+
   function prepareArms(rows) {
     return rows.map(function (r) {
       var vesas = String(r.vesa_supported || "")
         .split(";")
         .map(normalizeVesa)
         .filter(Boolean);
+      var sizeMinInch = parseFloat(r.size_min_inch);
+      var sizeMaxInch = parseFloat(r.size_max_inch);
       return {
         id: r.arm_id,
         brand: r.brand,
@@ -235,14 +291,56 @@
         color: r.color,
         armType: r.arm_type,
         displays: parseInt(r.displays_supported, 10) || 1,
+        vesaRaw: r.vesa_supported,
         vesaList: vesas,
         weightMin: parseFloat(r.weight_min_kg),
         weightMax: parseFloat(r.weight_max_kg),
-        sizeMinMm: parseFloat(r.size_min_mm),
-        sizeMaxMm: parseFloat(r.size_max_mm),
+        sizeMinInch: sizeMinInch,
+        sizeMaxInch: sizeMaxInch,
+        sizeMinMm: inchToMm(sizeMinInch),
+        sizeMaxMm: inchToMm(sizeMaxInch),
+        limitsPerDisplay: r.limits_per_display,
         mediaUrl: r.media_url,
         buyUrl: r.buy_url
       };
+    });
+  }
+
+  function renderSpecTable(arms) {
+    var tbody = byId(PREFIX + "-spec-body");
+    if (!tbody) {
+      return;
+    }
+    while (tbody.firstChild) {
+      tbody.removeChild(tbody.firstChild);
+    }
+
+    arms.forEach(function (arm) {
+      var suffix = perDisplaySuffix(arm.limitsPerDisplay);
+      var tr = document.createElement("tr");
+
+      var tdId = document.createElement("td");
+      tdId.className = PREFIX + "-table-model";
+      tdId.textContent = arm.id;
+      tr.appendChild(tdId);
+
+      var tdSize = document.createElement("td");
+      tdSize.textContent = formatRange(arm.sizeMinInch, arm.sizeMaxInch, "吋") + suffix;
+      tr.appendChild(tdSize);
+
+      var tdWeight = document.createElement("td");
+      tdWeight.textContent = formatRange(arm.weightMin, arm.weightMax, "Kg") + suffix;
+      tr.appendChild(tdWeight);
+
+      var tdVesa = document.createElement("td");
+      tdVesa.textContent = formatArmVesa(arm.vesaRaw);
+      tr.appendChild(tdVesa);
+
+      var tdType = document.createElement("td");
+      tdType.textContent = translateArmType(arm.armType);
+      tr.appendChild(tdType);
+
+      tbody.appendChild(tr);
     });
   }
 
@@ -257,7 +355,7 @@
       }
     }
     var sizeMm = inchToMm(monitor.sizeInch);
-    if (sizeMm != null) {
+    if (sizeMm != null && arm.sizeMinMm != null && arm.sizeMaxMm != null) {
       if (sizeMm < arm.sizeMinMm - 0.5 || sizeMm > arm.sizeMaxMm + 0.5) {
         return false;
       }
@@ -297,7 +395,10 @@
     if (sizeMm != null) {
       var sizeOk = state.arms.some(function (arm) {
         return (
-          sizeMm >= arm.sizeMinMm - 0.5 && sizeMm <= arm.sizeMaxMm + 0.5
+          arm.sizeMinMm != null &&
+          arm.sizeMaxMm != null &&
+          sizeMm >= arm.sizeMinMm - 0.5 &&
+          sizeMm <= arm.sizeMaxMm + 0.5
         );
       });
       if (!sizeOk) {
@@ -818,6 +919,7 @@
         state.monitors = prepareMonitors(parseCsv(texts[0]));
         state.arms = prepareArms(parseCsv(texts[1]));
 
+        renderSpecTable(state.arms);
         fillBrands(brandSelect);
         clearOptions(sizeSelect, "尺寸");
         sizeSelect.disabled = true;

@@ -24,6 +24,17 @@
   box-sizing: border-box;
 }
 
+/* Page title */
+.BNQARM01-title {
+  margin: 0;
+  padding: 0 0 8px;
+  font-weight: 700;
+  font-size: 36px;
+  line-height: 54px;
+  color: #333333;
+  word-break: break-word;
+}
+
 /* Intro */
 .BNQARM01-intro {
   padding: 16px 0;
@@ -623,6 +634,11 @@ button.BNQARM01-model-name:focus-visible {
     padding: 32px 24px 64px;
   }
 
+  .BNQARM01-title {
+    font-size: 32px;
+    line-height: 48px;
+  }
+
   .BNQARM01-heading {
     font-size: 24px;
     line-height: 36px;
@@ -686,6 +702,11 @@ button.BNQARM01-model-name:focus-visible {
   .BNQARM01-note-text {
     font-size: 16px;
     line-height: 25.6px;
+  }
+
+  .BNQARM01-title {
+    font-size: 26px;
+    line-height: 39px;
   }
 
   .BNQARM01-heading {
