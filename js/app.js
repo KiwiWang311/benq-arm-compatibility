@@ -24,31 +24,6 @@
     en: " (per display)"
   };
 
-  /** Marketing copy for arm cards */
-  var ARM_DISPLAY = {
-    BSH01: {
-      title: "ERGO ARM 氣壓式螢幕支架 (單臂)",
-      sizeLabel: "22 - 24 吋",
-      weightLabel: "2 - 20 Kg",
-      vesaLabel: "75x75 / 100x100",
-      desc: "氣壓式彈簧支架設計，高達 20 公斤的負重能力，為您的螢幕帶來穩定、持久的支撐。"
-    },
-    BSH02: {
-      title: "ERGO ARM 氣壓式螢幕支架 (單臂)",
-      sizeLabel: "22 - 45 吋",
-      weightLabel: "2 - 20 Kg",
-      vesaLabel: "75x75 / 100x100",
-      desc: "氣壓式彈簧支架設計，高達 20 公斤的負重能力，為您的螢幕帶來穩定、持久的支撐。"
-    },
-    BDH01: {
-      title: "ERGO ARM 氣壓式螢幕支架 (雙臂)",
-      sizeLabel: "17 - 35 吋",
-      weightLabel: "2 - 20 Kg",
-      vesaLabel: "75x75 / 100x100",
-      desc: "雙螢幕氣壓式支架設計，每臂高達 20 公斤負重，彈性調整雙螢幕工作站高度與角度。"
-    }
-  };
-
   var state = {
     monitors: [],
     arms: [],
@@ -251,9 +226,13 @@
     return map[key] || armType || "—";
   }
 
+  function isTruthyFlag(value) {
+    var flag = String(value || "").trim().toUpperCase();
+    return flag === "TRUE" || flag === "1" || flag === "Y" || flag === "YES";
+  }
+
   function perDisplaySuffix(limitsPerDisplay) {
-    var flag = String(limitsPerDisplay || "").toUpperCase();
-    if (flag !== "TRUE" && flag !== "1") {
+    if (!isTruthyFlag(limitsPerDisplay)) {
       return "";
     }
     return PER_DISPLAY_I18N[pageLang()] || PER_DISPLAY_I18N["zh-Hant"];
@@ -289,6 +268,10 @@
         brand: r.brand,
         productName: r.product_name,
         color: r.color,
+        productGroup: r.product_group || r.arm_id,
+        isGroupPrimary: isTruthyFlag(r.is_group_primary),
+        groupDisplayName: r.group_display_name,
+        groupDescription: r.group_description,
         armType: r.arm_type,
         displays: parseInt(r.displays_supported, 10) || 1,
         vesaRaw: r.vesa_supported,
@@ -570,6 +553,52 @@
     });
   }
 
+  /**
+   * Resolves the row that carries a group's display fields. Looked up across
+   * every arm rather than the matched subset, so the card keeps its name and
+   * copy even when only a non-primary variant passed the spec check.
+   */
+  function groupPrimary(groupKey) {
+    var members = state.arms.filter(function (arm) {
+      return arm.productGroup === groupKey;
+    });
+    var primary = members.filter(function (arm) {
+      return arm.isGroupPrimary;
+    })[0];
+    return primary || members[0] || null;
+  }
+
+  /**
+   * Collapses compatible arms into one entry per product_group. Runs after
+   * the compatibility filter so a variant that fails on specs never pulls
+   * its whole group into the recommendations.
+   */
+  function groupArms(arms) {
+    var groups = [];
+    var byKey = {};
+
+    arms.forEach(function (arm) {
+      var key = arm.productGroup;
+      if (!byKey[key]) {
+        byKey[key] = { key: key, matched: [] };
+        groups.push(byKey[key]);
+      }
+      byKey[key].matched.push(arm);
+    });
+
+    return groups.map(function (group) {
+      var lead = groupPrimary(group.key) || group.matched[0];
+      return {
+        key: group.key,
+        title: lead.groupDisplayName || lead.productName,
+        desc: lead.groupDescription,
+        mediaUrl: lead.mediaUrl,
+        buyUrl: lead.buyUrl,
+        matched: group.matched
+      };
+    });
+  }
+
   function renderNoMatch(text) {
     var el = byId(PREFIX + "-result-nomatch");
     if (!el) {
@@ -691,7 +720,7 @@
     });
   }
 
-  function renderRecommendations(arms) {
+  function renderRecommendations(groups) {
     var wrap = byId(PREFIX + "-recommend");
     var title = byId(PREFIX + "-recommend-title");
     var section = byId(PREFIX + "-recommend-section");
@@ -703,18 +732,13 @@
     }
 
     if (title) {
-      title.hidden = !arms.length;
+      title.hidden = !groups.length;
     }
     if (section) {
-      section.hidden = !arms.length;
+      section.hidden = !groups.length;
     }
 
-    arms.forEach(function (arm) {
-      var meta = ARM_DISPLAY[arm.id] || {
-        title: arm.productName,
-        desc: "氣壓式彈簧支架設計，高達 20 公斤的負重能力，為您的螢幕帶來穩定、持久的支撐。"
-      };
-
+    groups.forEach(function (group) {
       var card = document.createElement("article");
       card.className = PREFIX + "-card";
 
@@ -722,8 +746,8 @@
       media.className = PREFIX + "-card-media";
       var img = document.createElement("img");
       img.className = PREFIX + "-card-img";
-      img.src = arm.mediaUrl;
-      img.alt = meta.title;
+      img.src = group.mediaUrl;
+      img.alt = group.title;
       img.loading = "lazy";
       media.appendChild(img);
       card.appendChild(media);
@@ -733,18 +757,20 @@
 
       var h = document.createElement("h3");
       h.className = PREFIX + "-card-title";
-      h.textContent = meta.title;
+      h.textContent = group.title;
       body.appendChild(h);
 
-      var p = document.createElement("p");
-      p.className = PREFIX + "-card-desc";
-      p.textContent = meta.desc;
-      body.appendChild(p);
+      if (group.desc) {
+        var p = document.createElement("p");
+        p.className = PREFIX + "-card-desc";
+        p.textContent = group.desc;
+        body.appendChild(p);
+      }
 
-      if (arm.buyUrl) {
+      if (group.buyUrl) {
         var a = document.createElement("a");
         a.className = PREFIX + "-card-btn";
-        a.href = arm.buyUrl;
+        a.href = group.buyUrl;
         a.target = "_blank";
         a.rel = "noopener noreferrer";
         a.textContent = "了解詳情";
@@ -769,7 +795,7 @@
         var arms = recommendedArms(monitors);
         if (arms.length) {
           renderNoMatch("");
-          renderRecommendations(arms);
+          renderRecommendations(groupArms(arms));
         } else {
           renderRecommendations([]);
           renderNoMatch("尚無匹配的螢幕支架，" + noMatchReason(monitors[0]));
