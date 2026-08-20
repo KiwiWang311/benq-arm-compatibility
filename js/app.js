@@ -883,7 +883,7 @@
     fillSizes(sizeSelect, brand);
     sizeSelect.value = size;
 
-    renderModelOptions(modelSelect, { brand: brand });
+    renderModelOptions(modelSelect, { brand: brand, size: size });
     modelSelect.value = model;
 
     updateResults();
