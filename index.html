@@ -112,8 +112,19 @@
     aria-live="polite"
     aria-label="搜尋結果"
   >
-    <p class="BNQARM01-result-title" id="BNQARM01-result-title">搜尋結果型號</p>
-    <p class="BNQARM01-result-hint" id="BNQARM01-result-hint" hidden>請從下方清單選擇明確型號，以查看推薦 BenQ 螢幕支架。</p>
+    <div class="BNQARM01-result-header">
+      <button
+        type="button"
+        class="BNQARM01-back-btn"
+        id="BNQARM01-back-btn"
+        aria-label="返回搜尋結果列表"
+        hidden
+      >
+        <img class="BNQARM01-back-icon" src="img/back-icon.svg" width="20" height="20" alt="">
+      </button>
+      <p class="BNQARM01-result-title" id="BNQARM01-result-title" tabindex="-1">搜尋結果型號</p>
+    </div>
+    <p class="BNQARM01-result-hint" id="BNQARM01-result-hint" hidden>請從下方清單選擇明確型號，以查看適合的 BenQ 螢幕支架。</p>
     <div class="BNQARM01-result-table-wrap" id="BNQARM01-result-table-wrap" hidden>
       <table class="BNQARM01-result-table">
         <thead>
@@ -134,9 +145,9 @@
     class="BNQARM01-recommend-section"
     id="BNQARM01-recommend-section"
     hidden
-    aria-label="推薦 BenQ 螢幕支架"
+    aria-label="適合的 BenQ 螢幕支架"
   >
-    <p class="BNQARM01-recommend-title" id="BNQARM01-recommend-title">推薦 BenQ 螢幕支架：</p>
+    <p class="BNQARM01-recommend-title" id="BNQARM01-recommend-title">適合的 BenQ 螢幕支架：</p>
     <div class="BNQARM01-recommend" id="BNQARM01-recommend"></div>
   </section>
 

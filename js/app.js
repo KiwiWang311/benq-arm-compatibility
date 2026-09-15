@@ -618,6 +618,7 @@
     var hint = byId(PREFIX + "-result-hint");
     var tableWrap = byId(PREFIX + "-result-table-wrap");
     var tbody = byId(PREFIX + "-result-body");
+    var backBtn = byId(PREFIX + "-back-btn");
 
     if (title) {
       title.textContent = "搜尋結果型號";
@@ -632,6 +633,9 @@
       while (tbody.firstChild) {
         tbody.removeChild(tbody.firstChild);
       }
+    }
+    if (backBtn) {
+      backBtn.hidden = true;
     }
     renderNoMatch("");
     renderRecommendations([]);
@@ -665,6 +669,7 @@
     var hint = byId(PREFIX + "-result-hint");
     var tableWrap = byId(PREFIX + "-result-table-wrap");
     var tbody = byId(PREFIX + "-result-body");
+    var backBtn = byId(PREFIX + "-back-btn");
 
     if (!tbody) {
       return;
@@ -684,6 +689,9 @@
       if (tableWrap) {
         tableWrap.hidden = true;
       }
+      if (backBtn) {
+        backBtn.hidden = true;
+      }
       return;
     }
 
@@ -697,6 +705,9 @@
     }
     if (tableWrap) {
       tableWrap.hidden = false;
+    }
+    if (backBtn) {
+      backBtn.hidden = listMode;
     }
 
     monitors.forEach(function (m) {
@@ -889,6 +900,27 @@
     updateResults();
   }
 
+  /**
+   * Returns from a single-model detail view back to the brand/size result
+   * list, so users can compare a different model without reopening the
+   * model dropdown. Moves focus to the result title so screen reader users
+   * land on the refreshed list instead of losing focus to the now-hidden
+   * back button.
+   */
+  function backToList() {
+    var modelSelect = byId(PREFIX + "-model");
+    var title = byId(PREFIX + "-result-title");
+
+    state.model = "";
+    if (modelSelect) {
+      modelSelect.value = "";
+    }
+    updateResults();
+    if (title) {
+      title.focus();
+    }
+  }
+
   function onModelChange(modelSelect) {
     if (modelSelect.value) {
       var opt = modelSelect.selectedOptions[0];
@@ -915,6 +947,13 @@
     if (resetBtn) {
       resetBtn.addEventListener("click", function () {
         resetFilters();
+      });
+    }
+
+    var backBtn = byId(PREFIX + "-back-btn");
+    if (backBtn) {
+      backBtn.addEventListener("click", function () {
+        backToList();
       });
     }
   }
