@@ -289,6 +289,29 @@
     });
   }
 
+  /**
+   * Collapses colour variants (e.g. BSH01/BSH02) sharing a product_group
+   * into one spec-table row, since they're the same arm with identical
+   * specs. Row order follows first appearance in the CSV; the row's specs
+   * come from the group's primary arm (is_group_primary), matching how
+   * recommendation cards already pick a lead row per group.
+   */
+  function groupArmsByProductGroup(arms) {
+    var groups = [];
+    var byKey = {};
+    arms.forEach(function (arm) {
+      var key = arm.productGroup;
+      if (!byKey[key]) {
+        byKey[key] = { ids: [], lead: arm };
+        groups.push(byKey[key]);
+      } else if (arm.isGroupPrimary) {
+        byKey[key].lead = arm;
+      }
+      byKey[key].ids.push(arm.id);
+    });
+    return groups;
+  }
+
   function renderSpecTable(arms) {
     var tbody = byId(PREFIX + "-spec-body");
     if (!tbody) {
@@ -298,13 +321,14 @@
       tbody.removeChild(tbody.firstChild);
     }
 
-    arms.forEach(function (arm) {
+    groupArmsByProductGroup(arms).forEach(function (group) {
+      var arm = group.lead;
       var suffix = perDisplaySuffix(arm.limitsPerDisplay);
       var tr = document.createElement("tr");
 
       var tdId = document.createElement("td");
       tdId.className = PREFIX + "-table-model";
-      tdId.textContent = arm.id;
+      tdId.textContent = group.ids.join("、");
       tr.appendChild(tdId);
 
       var tdSize = document.createElement("td");
@@ -639,6 +663,7 @@
     }
     renderNoMatch("");
     renderRecommendations([]);
+    renderRecommendSummary(null, []);
   }
 
   function appendModelCell(tr, monitor, clickable) {
@@ -798,6 +823,125 @@
     });
   }
 
+  /**
+   * Weight tier a monitor should lead with, keyed to product_group values
+   * in BenQArmSpec.csv. 8kg is the single cutover: BenQ's guidance is to
+   * steer heavier screens to BSH (2-20kg) before they get close to BSL's
+   * 11kg ceiling, and everything at or under 8kg is comfortably within
+   * BSL's (2-11kg) range, so one threshold covers both "under 6kg" and
+   * "6-8kg" from the product brief without a separate branch.
+   */
+  var WEIGHT_TIER_PREFERENCE = [
+    { maxKg: 8, groupKey: "BSL" },
+    { maxKg: Infinity, groupKey: "BSH" }
+  ];
+
+  /**
+   * Short, factual selling point appended after the spec match, keyed by
+   * product_group so it stays in sync with which tier actually got
+   * recommended. Falls back to a neutral line for any group without a
+   * specific entry (e.g. if a dual-arm group is ever picked as lead).
+   */
+  var GROUP_BENEFIT_COPY = {
+    BSL: "價格更親民，日常使用也輕巧好調整",
+    BSH: "支撐更穩固，長時間使用也不易下滑"
+  };
+  var DEFAULT_BENEFIT_COPY = "安裝與調整都相當簡便";
+
+  /**
+   * Drafts the single-sentence recommendation shown above the cards. Only
+   * fires when the selected monitor has a known weight — CSV rows with a
+   * blank weight_kg (e.g. "-") can't be matched to a weight tier, so no
+   * summary is shown rather than guessing. Prefers the weight-tier arm
+   * (BSL under 8kg, BSH above) but only among groups that actually passed
+   * the compatibility check for this monitor; if the preferred tier didn't
+   * match (e.g. its size/VESA range excludes this screen), falls back to
+   * whichever compatible single-arm group has the smallest capacity that
+   * still fits, so the sentence never recommends something incompatible.
+   */
+  function buildSummaryParts(monitor, groups) {
+    if (!monitor || monitor.weightKg == null || !groups.length) {
+      return null;
+    }
+
+    var singleGroups = groups.filter(function (g) {
+      return g.matched[0].armType === "single";
+    });
+    if (!singleGroups.length) {
+      return null;
+    }
+
+    var preferredKey = WEIGHT_TIER_PREFERENCE.filter(function (tier) {
+      return monitor.weightKg <= tier.maxKg;
+    })[0].groupKey;
+
+    var lead = singleGroups.filter(function (g) {
+      return g.key === preferredKey;
+    })[0];
+
+    if (!lead) {
+      singleGroups.sort(function (a, b) {
+        return a.matched[0].weightMax - b.matched[0].weightMax;
+      });
+      lead = singleGroups[0];
+    }
+
+    var arm = lead.matched[0];
+    var benefit = GROUP_BENEFIT_COPY[lead.key] || DEFAULT_BENEFIT_COPY;
+    return [
+      { text: "您選擇的 " },
+      { text: monitor.modelName, strong: true },
+      {
+        text:
+          " 螢幕重量為 " +
+          formatWeight(monitor.weightRaw) +
+          "，建議優先選擇 "
+      },
+      { text: lead.title, strong: true },
+      {
+        text:
+          "，承重範圍 " +
+          arm.weightMin +
+          "–" +
+          arm.weightMax +
+          " Kg、適用尺寸 " +
+          arm.sizeMinInch +
+          "–" +
+          arm.sizeMaxInch +
+          " 吋，符合您的螢幕規格，且" +
+          benefit +
+          "。"
+      }
+    ];
+  }
+
+  function renderRecommendSummary(monitor, groups) {
+    var el = byId(PREFIX + "-recommend-summary");
+    if (!el) {
+      return;
+    }
+    while (el.firstChild) {
+      el.removeChild(el.firstChild);
+    }
+
+    var parts = buildSummaryParts(monitor, groups);
+    if (!parts) {
+      el.hidden = true;
+      return;
+    }
+
+    parts.forEach(function (part) {
+      if (part.strong) {
+        var strong = document.createElement("strong");
+        strong.textContent = part.text;
+        el.appendChild(strong);
+      } else {
+        el.appendChild(document.createTextNode(part.text));
+      }
+    });
+    el.hidden = false;
+  }
+
   function updateResults() {
     if (state.model) {
       var monitors = filteredMonitors();
@@ -806,13 +950,17 @@
         var arms = recommendedArms(monitors);
         if (arms.length) {
           renderNoMatch("");
-          renderRecommendations(groupArms(arms));
+          var groups = groupArms(arms);
+          renderRecommendations(groups);
+          renderRecommendSummary(monitors[0], groups);
         } else {
           renderRecommendations([]);
+          renderRecommendSummary(null, []);
           renderNoMatch("尚無匹配的螢幕支架，" + noMatchReason(monitors[0]));
         }
       } else {
         renderRecommendations([]);
+        renderRecommendSummary(null, []);
         renderNoMatch("");
       }
       return;
@@ -822,6 +970,7 @@
       renderNoMatch("");
       renderResultPanel(filteredMonitors(), "list");
       renderRecommendations([]);
+      renderRecommendSummary(null, []);
       return;
     }
 

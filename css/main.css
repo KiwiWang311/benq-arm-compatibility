@@ -512,6 +512,29 @@ button.BNQARM01-model-name:focus-visible {
   display: none !important;
 }
 
+.BNQARM01-recommend-summary[hidden] {
+  display: none !important;
+}
+
+.BNQARM01-recommend-summary {
+  width: 100%;
+  margin: 0;
+  margin-top: 16px;
+  padding: 16px 20px;
+  background-color: #f6f0fc;
+  border-radius: 12px;
+  color: #333333;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 25.6px;
+  word-break: break-word;
+}
+
+.BNQARM01-recommend-summary strong {
+  color: #5b27a0;
+  font-weight: 700;
+}
+
 .BNQARM01-recommend {
   display: flex;
   gap: 32px;
