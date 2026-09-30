@@ -92,9 +92,10 @@
   table-layout: fixed;
 }
 
+/* Header colours match benq.com's global notification bar. */
 .BNQARM01-table thead th {
-  background-color: #7231c6;
-  color: #ffffff;
+  background-color: #e6e6f2;
+  color: #000000;
   font-weight: 700;
   font-size: 18px;
   line-height: 28.8px;
@@ -104,9 +105,11 @@
   white-space: nowrap;
 }
 
-.BNQARM01-table tbody td {
+.BNQARM01-table tbody td,
+.BNQARM01-table tbody th {
   padding: 14px;
   font-size: 18px;
+  font-weight: 400;
   line-height: 28.8px;
   color: #333333;
   text-align: left;
@@ -114,11 +117,19 @@
   border-bottom: 1px solid #e7e7e7;
 }
 
-.BNQARM01-table tbody tr:last-child td {
+.BNQARM01-table tbody tr:last-child td,
+.BNQARM01-table tbody tr:last-child th {
   border-bottom: none;
 }
 
-.BNQARM01-table-model {
+/* Only focusable while the table overflows (see updateScrollRegions). */
+.BNQARM01-table-wrap:focus-visible,
+.BNQARM01-result-table-wrap:focus-visible {
+  outline: 2px solid #7231c6;
+  outline-offset: 2px;
+}
+
+.BNQARM01-table tbody .BNQARM01-table-model {
   font-weight: 700;
 }
 
@@ -290,10 +301,10 @@
   height: 60px;
   margin: 0;
   padding: 8px 24px;
-  border: 1px solid #7231c6;
-  border-radius: 999px;
+  border: 2px solid #000000;
+  border-radius: 4px;
   background-color: #ffffff;
-  color: #7231c6;
+  color: #000000;
   font-family: inherit;
   font-weight: 700;
   font-size: 16px;
@@ -306,9 +317,9 @@
 
 .BNQARM01-reset-btn:hover,
 .BNQARM01-reset-btn:focus {
-  background-color: #f6f0fc;
-  color: #5b27a0;
-  border-color: #5b27a0;
+  background-color: #7231c6;
+  color: #ffffff;
+  border-color: #7231c6;
 }
 
 .BNQARM01-reset-btn:focus-visible {
@@ -414,7 +425,7 @@
   font-weight: 400;
   font-size: 16px;
   line-height: 25.6px;
-  color: #747474;
+  color: #4d4f52;
 }
 
 .BNQARM01-result-table-wrap[hidden] {
@@ -435,8 +446,8 @@
 }
 
 .BNQARM01-result-table thead th {
-  background-color: #e2e2e2;
-  color: #747474;
+  background-color: #e6e6f2;
+  color: #000000;
   font-weight: 700;
   font-size: 16px;
   line-height: 28.8px;
@@ -446,9 +457,11 @@
   white-space: nowrap;
 }
 
-.BNQARM01-result-table tbody td {
+.BNQARM01-result-table tbody td,
+.BNQARM01-result-table tbody th {
   padding: 14px;
   font-size: 16px;
+  font-weight: 400;
   line-height: 28.8px;
   color: #333333;
   text-align: left;
@@ -540,7 +553,9 @@ button.BNQARM01-model-name:focus-visible {
   gap: 32px;
   align-items: stretch;
   width: 100%;
-  padding-top: 32px;
+  margin: 0;
+  padding: 32px 0 0;
+  list-style: none;
 }
 
 .BNQARM01-card {
@@ -552,13 +567,16 @@ button.BNQARM01-model-name:focus-visible {
   min-width: 0;
   padding: 24px;
   background-color: #ffffff;
-  border: 2px solid #ededed;
+  border: 1px solid #cccccc;
+  border-radius: 16px;
 }
 
 .BNQARM01-card-media {
-  flex: 0 0 180px;
+  flex: 0 0 auto;
   width: 180px;
-  height: 180px;
+  max-width: 100%;
+  height: auto;
+  aspect-ratio: 1 / 1;
   overflow: hidden;
   position: relative;
   background-color: #f5f5f5;
@@ -598,28 +616,40 @@ button.BNQARM01-model-name:focus-visible {
   color: #333333;
 }
 
-.BNQARM01-card-btn {
-  display: flex;
+/* Text link matching benq.com's "了解更多 >"; the vertical padding keeps a
+ * 44px tall hit area without changing how the link looks. */
+.BNQARM01-card-link {
+  display: inline-flex;
+  align-self: center;
   align-items: center;
-  justify-content: center;
-  width: 100%;
+  gap: 4px;
   margin-top: auto;
-  padding: 8px 12px;
-  border-radius: 999px;
-  background-color: #7231c6;
-  color: #ffffff;
-  font-weight: 700;
-  font-size: 16px;
-  line-height: normal;
+  padding: 11px 0;
+  color: #7231c6;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 22px;
   text-decoration: none;
   cursor: pointer;
-  border: 0;
 }
 
-.BNQARM01-card-btn:hover,
-.BNQARM01-card-btn:focus {
-  background-color: #5b27a0;
-  color: #ffffff;
+.BNQARM01-card-link:hover,
+.BNQARM01-card-link:focus-visible {
+  color: #7231c6;
+  text-decoration: underline;
+  text-underline-position: from-font;
+}
+
+.BNQARM01-card-link:focus-visible {
+  outline: 2px solid #7231c6;
+  outline-offset: 2px;
+}
+
+.BNQARM01-card-link-icon {
+  flex: 0 0 12px;
+  width: 12px;
+  height: 12px;
+  fill: currentColor;
 }
 
 /* Note */
@@ -802,7 +832,8 @@ button.BNQARM01-model-name:focus-visible {
   }
 
   .BNQARM01-table thead th,
-  .BNQARM01-table tbody td {
+  .BNQARM01-table tbody td,
+  .BNQARM01-table tbody th {
     font-size: 14px;
     line-height: 22.4px;
     padding: 10px 8px;
@@ -848,7 +879,8 @@ button.BNQARM01-model-name:focus-visible {
   }
 
   .BNQARM01-result-table thead th,
-  .BNQARM01-result-table tbody td {
+  .BNQARM01-result-table tbody td,
+  .BNQARM01-result-table tbody th {
     font-size: 14px;
     line-height: 22.4px;
     padding: 10px 8px;

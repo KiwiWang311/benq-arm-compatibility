@@ -326,10 +326,11 @@
       var suffix = perDisplaySuffix(arm.limitsPerDisplay);
       var tr = document.createElement("tr");
 
-      var tdId = document.createElement("td");
-      tdId.className = PREFIX + "-table-model";
-      tdId.textContent = group.ids.join("、");
-      tr.appendChild(tdId);
+      var thId = document.createElement("th");
+      thId.scope = "row";
+      thId.className = PREFIX + "-table-model";
+      thId.textContent = group.ids.join("、");
+      tr.appendChild(thId);
 
       var tdSize = document.createElement("td");
       tdSize.textContent = formatRange(arm.sizeMinInch, arm.sizeMaxInch, "吋") + suffix;
@@ -664,11 +665,13 @@
     renderNoMatch("");
     renderRecommendations([]);
     renderRecommendSummary(null, []);
+    announce("");
   }
 
   function appendModelCell(tr, monitor, clickable) {
-    var tdModel = document.createElement("td");
-    tdModel.className = PREFIX + "-result-col-model";
+    var thModel = document.createElement("th");
+    thModel.scope = "row";
+    thModel.className = PREFIX + "-result-col-model";
 
     if (clickable) {
       var modelBtn = document.createElement("button");
@@ -678,15 +681,15 @@
       modelBtn.addEventListener("click", function () {
         applyModelSelection(monitor.brand, monitor.sizeInch, monitor.modelName);
       });
-      tdModel.appendChild(modelBtn);
+      thModel.appendChild(modelBtn);
     } else {
       var modelText = document.createElement("span");
       modelText.className = PREFIX + "-model-name";
       modelText.textContent = monitor.modelName;
-      tdModel.appendChild(modelText);
+      thModel.appendChild(modelText);
     }
 
-    tr.appendChild(tdModel);
+    tr.appendChild(thModel);
   }
 
   function renderResultPanel(monitors, mode) {
@@ -756,6 +759,41 @@
     });
   }
 
+  /**
+   * "了解更多 >" link styled after benq.com. The visually hidden suffix names
+   * the product and warns about the new tab, so the three identical-looking
+   * links stay distinguishable for screen reader users.
+   */
+  function buildCardLink(group) {
+    var a = document.createElement("a");
+    a.className = PREFIX + "-card-link";
+    a.href = group.buyUrl;
+    a.target = "_blank";
+    a.rel = "noopener noreferrer";
+    a.appendChild(document.createTextNode("了解更多"));
+
+    var hidden = document.createElement("span");
+    hidden.className = PREFIX + "-visually-hidden";
+    hidden.textContent = "：" + group.title + "（另開新視窗）";
+    a.appendChild(hidden);
+
+    var svgNs = "http://www.w3.org/2000/svg";
+    var icon = document.createElementNS(svgNs, "svg");
+    icon.setAttribute("class", PREFIX + "-card-link-icon");
+    icon.setAttribute("viewBox", "0 0 24 24");
+    icon.setAttribute("aria-hidden", "true");
+    icon.setAttribute("focusable", "false");
+    var path = document.createElementNS(svgNs, "path");
+    path.setAttribute(
+      "d",
+      "M7.889 21.838 17.539 12.188 7.889 2.537 6.464 3.962 14.714 12.188 6.464 20.413Z"
+    );
+    icon.appendChild(path);
+    a.appendChild(icon);
+
+    return a;
+  }
+
   function renderRecommendations(groups) {
     var wrap = byId(PREFIX + "-recommend");
     var title = byId(PREFIX + "-recommend-title");
@@ -775,7 +813,7 @@
     }
 
     groups.forEach(function (group) {
-      var card = document.createElement("article");
+      var card = document.createElement("li");
       card.className = PREFIX + "-card";
 
       var media = document.createElement("div");
@@ -783,7 +821,8 @@
       var img = document.createElement("img");
       img.className = PREFIX + "-card-img";
       img.src = group.mediaUrl;
-      img.alt = group.title;
+      // Decorative: the product name is already in the card heading below.
+      img.alt = "";
       img.loading = "lazy";
       media.appendChild(img);
       card.appendChild(media);
@@ -791,7 +830,7 @@
       var body = document.createElement("div");
       body.className = PREFIX + "-card-body";
 
-      var h = document.createElement("h3");
+      var h = document.createElement("h4");
       h.className = PREFIX + "-card-title";
       h.textContent = group.title;
       body.appendChild(h);
@@ -804,18 +843,7 @@
       }
 
       if (group.buyUrl) {
-        var a = document.createElement("a");
-        a.className = PREFIX + "-card-btn";
-        a.href = group.buyUrl;
-        a.target = "_blank";
-        a.rel = "noopener noreferrer";
-        a.textContent = "了解詳情";
-        body.appendChild(a);
-      } else {
-        var btn = document.createElement("span");
-        btn.className = PREFIX + "-card-btn";
-        btn.textContent = "了解詳情";
-        body.appendChild(btn);
+        body.appendChild(buildCardLink(group));
       }
 
       card.appendChild(body);
@@ -942,7 +970,54 @@
     el.hidden = false;
   }
 
+  /**
+   * Short screen reader summary of what just changed. Replaces a live region
+   * on the whole results block, which read every table row aloud and never
+   * covered the recommendation cards.
+   */
+  function announce(text) {
+    var el = byId(PREFIX + "-status");
+    if (el) {
+      el.textContent = text;
+    }
+  }
+
+  /**
+   * Wide tables scroll sideways on small screens. Only while they actually
+   * overflow, make the wrapper a named, focusable region so keyboard users
+   * can scroll it with the arrow keys; otherwise drop it from the tab order.
+   */
+  function updateScrollRegions() {
+    var attr = "data-" + PREFIX.toLowerCase() + "-scroll-region";
+    var regions = document.querySelectorAll("[" + attr + "]");
+    Array.prototype.forEach.call(regions, function (el) {
+      if (el.scrollWidth > el.clientWidth) {
+        el.setAttribute("tabindex", "0");
+        el.setAttribute("role", "region");
+        el.setAttribute("aria-labelledby", el.getAttribute(attr));
+      } else {
+        el.removeAttribute("tabindex");
+        el.removeAttribute("role");
+        el.removeAttribute("aria-labelledby");
+      }
+    });
+  }
+
+  function setSizeEnabled(sizeSelect, enabled) {
+    sizeSelect.disabled = !enabled;
+    if (enabled) {
+      sizeSelect.removeAttribute("aria-describedby");
+    } else {
+      sizeSelect.setAttribute("aria-describedby", PREFIX + "-size-hint");
+    }
+  }
+
   function updateResults() {
+    renderResults();
+    updateScrollRegions();
+  }
+
+  function renderResults() {
     if (state.model) {
       var monitors = filteredMonitors();
       renderResultPanel(monitors, "detail");
@@ -953,24 +1028,36 @@
           var groups = groupArms(arms);
           renderRecommendations(groups);
           renderRecommendSummary(monitors[0], groups);
+          announce(
+            "已選擇 " + state.model + "，找到 " + groups.length + " 款適合的 BenQ 螢幕支架。"
+          );
         } else {
+          var reason = "尚無匹配的螢幕支架，" + noMatchReason(monitors[0]);
           renderRecommendations([]);
           renderRecommendSummary(null, []);
-          renderNoMatch("尚無匹配的螢幕支架，" + noMatchReason(monitors[0]));
+          renderNoMatch(reason);
+          announce(reason);
         }
       } else {
         renderRecommendations([]);
         renderRecommendSummary(null, []);
         renderNoMatch("");
+        announce("查無相符型號。");
       }
       return;
     }
 
     if (state.brand && state.size) {
+      var listed = filteredMonitors();
       renderNoMatch("");
-      renderResultPanel(filteredMonitors(), "list");
+      renderResultPanel(listed, "list");
       renderRecommendations([]);
       renderRecommendSummary(null, []);
+      announce(
+        listed.length
+          ? "找到 " + listed.length + " 個型號，請從清單選擇型號以查看適合的支架。"
+          : "查無相符型號。"
+      );
       return;
     }
 
@@ -990,7 +1077,7 @@
       brandSelect.value = "";
     }
     if (sizeSelect) {
-      sizeSelect.disabled = true;
+      setSizeEnabled(sizeSelect, false);
       clearOptions(sizeSelect, "尺寸");
     }
     if (modelSelect) {
@@ -998,6 +1085,7 @@
     }
 
     clearResults();
+    announce("已重設篩選條件。");
   }
 
   function onBrandChange(sizeSelect, modelSelect) {
@@ -1006,11 +1094,11 @@
     state.model = "";
 
     if (state.brand) {
-      sizeSelect.disabled = false;
+      setSizeEnabled(sizeSelect, true);
       fillSizes(sizeSelect, state.brand);
       renderModelOptions(modelSelect, { brand: state.brand });
     } else {
-      sizeSelect.disabled = true;
+      setSizeEnabled(sizeSelect, false);
       clearOptions(sizeSelect, "尺寸");
       renderModelOptions(modelSelect, {});
     }
@@ -1039,7 +1127,7 @@
     state.model = model;
 
     brandSelect.value = brand;
-    sizeSelect.disabled = false;
+    setSizeEnabled(sizeSelect, true);
     fillSizes(sizeSelect, brand);
     sizeSelect.value = size;
 
@@ -1136,10 +1224,12 @@
         renderSpecTable(state.arms);
         fillBrands(brandSelect);
         clearOptions(sizeSelect, "尺寸");
-        sizeSelect.disabled = true;
+        setSizeEnabled(sizeSelect, false);
         renderModelOptions(modelSelect, {});
         bindEvents(brandSelect, sizeSelect, modelSelect);
         clearResults();
+        updateScrollRegions();
+        window.addEventListener("resize", updateScrollRegions);
       })
       .catch(function (err) {
         showLoadError(
