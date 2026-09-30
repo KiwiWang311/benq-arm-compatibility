@@ -579,7 +579,7 @@ button.BNQARM01-model-name:focus-visible {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  justify-content: center;
+  justify-content: flex-start;
 }
 
 .BNQARM01-card-title {
@@ -603,6 +603,7 @@ button.BNQARM01-model-name:focus-visible {
   align-items: center;
   justify-content: center;
   width: 100%;
+  margin-top: auto;
   padding: 8px 12px;
   border-radius: 999px;
   background-color: #7231c6;
