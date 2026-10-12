@@ -4,7 +4,107 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>BenQ 螢幕支架能裝我的螢幕嗎？</title>
+  <meta name="description" content="BenQ 螢幕支架能裝我的螢幕嗎？只要螢幕背面為 VESA 75×75 或 100×100 孔位，且重量在支架承重範圍內即可安裝。查看 BSH01、BSH02、BDH01、BSL01 的尺寸與承重規格，並查詢你的螢幕型號是否相容。">
   <link href="css/main.css" rel="stylesheet">
+  <!--
+    Structured data for search engines and AI answer engines. Covers only the
+    public BenQ arm specs shown in the spec table below; the monitor list is
+    intentionally left out. Keep in sync with js/data/BenQArmSpec.csv.
+    @id values are page-local; replace with absolute URLs once the final
+    page URL is known.
+  -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebPage",
+        "@id": "#webpage",
+        "name": "BenQ 螢幕支架能裝我的螢幕嗎？",
+        "description": "BenQ 螢幕支架能裝我的螢幕嗎？只要螢幕背面為 VESA 75×75 或 100×100 孔位，且重量在支架承重範圍內即可安裝。查看 BSH01、BSH02、BDH01、BSL01 的尺寸與承重規格，並查詢你的螢幕型號是否相容。",
+        "inLanguage": "zh-Hant",
+        "dateModified": "2026-10-12",
+        "publisher": { "@id": "#benq" },
+        "mainEntity": { "@id": "#arm-list" }
+      },
+      {
+        "@type": "Organization",
+        "@id": "#benq",
+        "name": "BenQ",
+        "url": "https://www.benq.com/zh-tw/"
+      },
+      {
+        "@type": "ItemList",
+        "@id": "#arm-list",
+        "name": "BenQ 螢幕支架型號",
+        "numberOfItems": 3,
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "item": { "@id": "#arm-bsh" } },
+          { "@type": "ListItem", "position": 2, "item": { "@id": "#arm-bdh" } },
+          { "@type": "ListItem", "position": 3, "item": { "@id": "#arm-bsl" } }
+        ]
+      },
+      {
+        "@type": "ProductGroup",
+        "@id": "#arm-bsh",
+        "name": "BenQ ERGO ARM 氣壓式螢幕支架 BSH01、BSH02",
+        "productGroupID": "BSH",
+        "brand": { "@type": "Brand", "name": "BenQ" },
+        "variesBy": "https://schema.org/color",
+        "additionalProperty": [
+          { "@type": "PropertyValue", "name": "承重", "minValue": 2, "maxValue": 20, "unitCode": "KGM", "unitText": "kg" },
+          { "@type": "PropertyValue", "name": "適用螢幕尺寸", "minValue": 17, "maxValue": 45, "unitCode": "INH", "unitText": "吋" },
+          { "@type": "PropertyValue", "name": "VESA 規格", "value": "75x75、100x100" },
+          { "@type": "PropertyValue", "name": "支援螢幕數", "value": 1 }
+        ],
+        "hasVariant": [
+          {
+            "@type": "Product",
+            "sku": "BSH01",
+            "name": "BenQ ERGO ARM 氣壓式螢幕支架 BSH01（黑色）",
+            "color": "黑色",
+            "image": "https://image.benq.com/is/image/benqco/03-bsh01-front45?$ResponsivePreset$"
+          },
+          {
+            "@type": "Product",
+            "sku": "BSH02",
+            "name": "BenQ ERGO ARM 氣壓式螢幕支架 BSH02（白色）",
+            "color": "白色",
+            "image": "https://image.benq.com/is/image/benqco/04-bsh02-front45?$ResponsivePreset$"
+          }
+        ]
+      },
+      {
+        "@type": "Product",
+        "@id": "#arm-bdh",
+        "name": "BenQ ERGO ARM 氣壓式雙臂螢幕支架 BDH01",
+        "sku": "BDH01",
+        "brand": { "@type": "Brand", "name": "BenQ" },
+        "image": "https://image.benq.com/is/image/benqco/10-bdh01-back45-1?$ResponsivePreset$&fmt=png-alpha",
+        "additionalProperty": [
+          { "@type": "PropertyValue", "name": "每個螢幕承重", "minValue": 2, "maxValue": 20, "unitCode": "KGM", "unitText": "kg" },
+          { "@type": "PropertyValue", "name": "每個螢幕適用尺寸", "minValue": 17, "maxValue": 35, "unitCode": "INH", "unitText": "吋" },
+          { "@type": "PropertyValue", "name": "VESA 規格", "value": "75x75、100x100" },
+          { "@type": "PropertyValue", "name": "支援螢幕數", "value": 2 }
+        ]
+      },
+      {
+        "@type": "Product",
+        "@id": "#arm-bsl",
+        "name": "BenQ ERGO ARM 氣壓式螢幕支架（輕量款）BSL01",
+        "sku": "BSL01",
+        "brand": { "@type": "Brand", "name": "BenQ" },
+        "image": "https://image.benq.com/is/image/benqco/03-bsl_front45?$ResponsivePreset$&fmt=png-alpha",
+        "additionalProperty": [
+          { "@type": "PropertyValue", "name": "承重", "minValue": 2, "maxValue": 11, "unitCode": "KGM", "unitText": "kg" },
+          { "@type": "PropertyValue", "name": "適用螢幕尺寸", "minValue": 17, "maxValue": 40, "unitCode": "INH", "unitText": "吋" },
+          { "@type": "PropertyValue", "name": "VESA 規格", "value": "75x75、100x100" },
+          { "@type": "PropertyValue", "name": "支援螢幕數", "value": 1 }
+        ]
+      }
+    ]
+  }
+  </script>
 </head>
 <body>
 
@@ -35,7 +135,31 @@
             <th scope="col">支援螢幕數</th>
           </tr>
         </thead>
-        <tbody id="BNQARM01-spec-body"></tbody>
+        <!-- Static so crawlers that skip JavaScript can read it. Keep in sync
+             with js/data/BenQArmSpec.csv and the JSON-LD in <head>. -->
+        <tbody>
+          <tr>
+            <th scope="row" class="BNQARM01-table-model">BSH01、BSH02</th>
+            <td>17 - 45 吋</td>
+            <td>2 - 20 Kg</td>
+            <td>75x75 / 100x100</td>
+            <td>單螢幕</td>
+          </tr>
+          <tr>
+            <th scope="row" class="BNQARM01-table-model">BDH01</th>
+            <td>17 - 35 吋 (每螢幕)</td>
+            <td>2 - 20 Kg (每螢幕)</td>
+            <td>75x75 / 100x100</td>
+            <td>雙螢幕</td>
+          </tr>
+          <tr>
+            <th scope="row" class="BNQARM01-table-model">BSL01</th>
+            <td>17 - 40 吋</td>
+            <td>2 - 11 Kg</td>
+            <td>75x75 / 100x100</td>
+            <td>單螢幕</td>
+          </tr>
+        </tbody>
       </table>
     </div>
   </section>
@@ -107,6 +231,16 @@
         重設
       </button>
     </div>
+
+    <noscript>
+      <div class="BNQARM01-noscript">
+        <p>本查詢工具需要啟用 JavaScript。您也可以依以下兩個條件自行判斷螢幕是否相容：</p>
+        <ol>
+          <li>螢幕背面孔位為 VESA 75x75 或 100x100。</li>
+          <li>螢幕重量在支架承重範圍內：BSL01 為 2 - 11 Kg，BSH01、BSH02 為 2 - 20 Kg，BDH01 每個螢幕為 2 - 20 Kg。</li>
+        </ol>
+      </div>
+    </noscript>
   </section>
 
   <p class="BNQARM01-visually-hidden" id="BNQARM01-status" role="status"></p>

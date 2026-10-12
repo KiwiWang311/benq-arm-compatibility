@@ -12,18 +12,6 @@
   var MONITOR_CSV = DATA_BASE + "MonitorSpec.csv";
   var ARM_CSV = DATA_BASE + "BenQArmSpec.csv";
 
-  var ARM_TYPE_I18N = {
-    "zh-Hant": { single: "單螢幕", dual: "雙螢幕" },
-    zh: { single: "單螢幕", dual: "雙螢幕" },
-    en: { single: "Single monitor", dual: "Dual monitor" }
-  };
-
-  var PER_DISPLAY_I18N = {
-    "zh-Hant": " (每螢幕)",
-    zh: " (每螢幕)",
-    en: " (per display)"
-  };
-
   var state = {
     monitors: [],
     arms: [],
@@ -209,50 +197,9 @@
     });
   }
 
-  function pageLang() {
-    var lang = String(document.documentElement.lang || "zh-Hant").toLowerCase();
-    if (lang.indexOf("zh") === 0) {
-      return "zh-Hant";
-    }
-    if (lang.indexOf("en") === 0) {
-      return "en";
-    }
-    return "zh-Hant";
-  }
-
-  function translateArmType(armType) {
-    var map = ARM_TYPE_I18N[pageLang()] || ARM_TYPE_I18N["zh-Hant"];
-    var key = String(armType || "").toLowerCase();
-    return map[key] || armType || "—";
-  }
-
   function isTruthyFlag(value) {
     var flag = String(value || "").trim().toUpperCase();
     return flag === "TRUE" || flag === "1" || flag === "Y" || flag === "YES";
-  }
-
-  function perDisplaySuffix(limitsPerDisplay) {
-    if (!isTruthyFlag(limitsPerDisplay)) {
-      return "";
-    }
-    return PER_DISPLAY_I18N[pageLang()] || PER_DISPLAY_I18N["zh-Hant"];
-  }
-
-  function formatRange(min, max, unit) {
-    if (min == null || isNaN(min) || max == null || isNaN(max)) {
-      return "—";
-    }
-    return min + " - " + max + " " + unit;
-  }
-
-  function formatArmVesa(value) {
-    var parts = String(value || "")
-      .split(";")
-      .map(function (s) {
-        return s.trim();
-      })
-      .filter(Boolean);
-    return parts.length ? parts.join(" / ") : "—";
   }
 
   function prepareArms(rows) {
@@ -286,69 +233,6 @@
         mediaUrl: r.media_url,
         buyUrl: r.buy_url
       };
-    });
-  }
-
-  /**
-   * Collapses colour variants (e.g. BSH01/BSH02) sharing a product_group
-   * into one spec-table row, since they're the same arm with identical
-   * specs. Row order follows first appearance in the CSV; the row's specs
-   * come from the group's primary arm (is_group_primary), matching how
-   * recommendation cards already pick a lead row per group.
-   */
-  function groupArmsByProductGroup(arms) {
-    var groups = [];
-    var byKey = {};
-    arms.forEach(function (arm) {
-      var key = arm.productGroup;
-      if (!byKey[key]) {
-        byKey[key] = { ids: [], lead: arm };
-        groups.push(byKey[key]);
-      } else if (arm.isGroupPrimary) {
-        byKey[key].lead = arm;
-      }
-      byKey[key].ids.push(arm.id);
-    });
-    return groups;
-  }
-
-  function renderSpecTable(arms) {
-    var tbody = byId(PREFIX + "-spec-body");
-    if (!tbody) {
-      return;
-    }
-    while (tbody.firstChild) {
-      tbody.removeChild(tbody.firstChild);
-    }
-
-    groupArmsByProductGroup(arms).forEach(function (group) {
-      var arm = group.lead;
-      var suffix = perDisplaySuffix(arm.limitsPerDisplay);
-      var tr = document.createElement("tr");
-
-      var thId = document.createElement("th");
-      thId.scope = "row";
-      thId.className = PREFIX + "-table-model";
-      thId.textContent = group.ids.join("、");
-      tr.appendChild(thId);
-
-      var tdSize = document.createElement("td");
-      tdSize.textContent = formatRange(arm.sizeMinInch, arm.sizeMaxInch, "吋") + suffix;
-      tr.appendChild(tdSize);
-
-      var tdWeight = document.createElement("td");
-      tdWeight.textContent = formatRange(arm.weightMin, arm.weightMax, "Kg") + suffix;
-      tr.appendChild(tdWeight);
-
-      var tdVesa = document.createElement("td");
-      tdVesa.textContent = formatArmVesa(arm.vesaRaw);
-      tr.appendChild(tdVesa);
-
-      var tdType = document.createElement("td");
-      tdType.textContent = translateArmType(arm.armType);
-      tr.appendChild(tdType);
-
-      tbody.appendChild(tr);
     });
   }
 
@@ -1221,7 +1105,6 @@
         state.monitors = prepareMonitors(parseCsv(texts[0]));
         state.arms = prepareArms(parseCsv(texts[1]));
 
-        renderSpecTable(state.arms);
         fillBrands(brandSelect);
         clearOptions(sizeSelect, "尺寸");
         setSizeEnabled(sizeSelect, false);

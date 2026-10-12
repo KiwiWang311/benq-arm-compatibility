@@ -721,6 +721,27 @@ button.BNQARM01-model-name:focus-visible {
   border: 0;
 }
 
+/* Shown only when JavaScript is off (and read by crawlers that skip it). */
+.BNQARM01-noscript {
+  width: 100%;
+  margin-top: 24px;
+  padding: 16px 20px;
+  background-color: #dae8f2;
+  border-radius: 12px;
+  color: #333333;
+  font-size: 16px;
+  line-height: 25.6px;
+}
+
+.BNQARM01-noscript p,
+.BNQARM01-noscript ol {
+  margin: 0;
+}
+
+.BNQARM01-noscript ol {
+  padding-left: 24px;
+}
+
 .BNQARM01-load-error {
   margin: 0 0 16px;
   padding: 12px 16px;
