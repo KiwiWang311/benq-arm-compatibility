@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>BenQ 螢幕支架能裝我的螢幕嗎？</title>
-  <meta name="description" content="BenQ 螢幕支架能裝我的螢幕嗎？只要螢幕背面為 VESA 75×75 或 100×100 孔位，且重量在支架承重範圍內即可安裝。查看 BSH01、BSH02、BDH01、BSL01 的尺寸與承重規格，並查詢你的螢幕型號是否相容。">
+  <meta name="description" content="BenQ 螢幕支架能裝我的螢幕嗎？只要螢幕背面為 VESA 75×75 或 100×100 孔位，且重量在支架承重範圍內即可安裝。查看 BSH01、BSH02、BDH01、BDH02、BSL01、BDL01 的尺寸與承重規格，並查詢你的螢幕型號是否相容。">
   <link href="css/main.css" rel="stylesheet">
   <!--
     Structured data for search engines and AI answer engines. Covers only the
@@ -21,9 +21,9 @@
         "@type": "WebPage",
         "@id": "#webpage",
         "name": "BenQ 螢幕支架能裝我的螢幕嗎？",
-        "description": "BenQ 螢幕支架能裝我的螢幕嗎？只要螢幕背面為 VESA 75×75 或 100×100 孔位，且重量在支架承重範圍內即可安裝。查看 BSH01、BSH02、BDH01、BSL01 的尺寸與承重規格，並查詢你的螢幕型號是否相容。",
+        "description": "BenQ 螢幕支架能裝我的螢幕嗎？只要螢幕背面為 VESA 75×75 或 100×100 孔位，且重量在支架承重範圍內即可安裝。查看 BSH01、BSH02、BDH01、BDH02、BSL01、BDL01 的尺寸與承重規格，並查詢你的螢幕型號是否相容。",
         "inLanguage": "zh-Hant",
-        "dateModified": "2026-10-12",
+        "dateModified": "2026-11-03",
         "publisher": { "@id": "#benq" },
         "mainEntity": { "@id": "#arm-list" }
       },
@@ -37,11 +37,12 @@
         "@type": "ItemList",
         "@id": "#arm-list",
         "name": "BenQ 螢幕支架型號",
-        "numberOfItems": 3,
+        "numberOfItems": 4,
         "itemListElement": [
           { "@type": "ListItem", "position": 1, "item": { "@id": "#arm-bsh" } },
           { "@type": "ListItem", "position": 2, "item": { "@id": "#arm-bdh" } },
-          { "@type": "ListItem", "position": 3, "item": { "@id": "#arm-bsl" } }
+          { "@type": "ListItem", "position": 3, "item": { "@id": "#arm-bsl" } },
+          { "@type": "ListItem", "position": 4, "item": { "@id": "#arm-bdl" } }
         ]
       },
       {
@@ -75,17 +76,33 @@
         ]
       },
       {
-        "@type": "Product",
+        "@type": "ProductGroup",
         "@id": "#arm-bdh",
-        "name": "BenQ ERGO ARM 氣壓式雙臂螢幕支架 BDH01",
-        "sku": "BDH01",
+        "name": "BenQ ERGO ARM 氣壓式雙臂螢幕支架 BDH01、BDH02",
+        "productGroupID": "BDH",
         "brand": { "@type": "Brand", "name": "BenQ" },
-        "image": "https://image.benq.com/is/image/benqco/10-bdh01-back45-1?$ResponsivePreset$&fmt=png-alpha",
+        "variesBy": "https://schema.org/color",
         "additionalProperty": [
           { "@type": "PropertyValue", "name": "每個螢幕承重", "minValue": 2, "maxValue": 20, "unitCode": "KGM", "unitText": "kg" },
           { "@type": "PropertyValue", "name": "每個螢幕適用尺寸", "minValue": 17, "maxValue": 35, "unitCode": "INH", "unitText": "吋" },
           { "@type": "PropertyValue", "name": "VESA 規格", "value": "75x75、100x100" },
           { "@type": "PropertyValue", "name": "支援螢幕數", "value": 2 }
+        ],
+        "hasVariant": [
+          {
+            "@type": "Product",
+            "sku": "BDH01",
+            "name": "BenQ ERGO ARM 氣壓式雙臂螢幕支架 BDH01（黑色）",
+            "color": "黑色",
+            "image": "https://image.benq.com/is/image/benqco/10-bdh01-back45-1?$ResponsivePreset$&fmt=png-alpha"
+          },
+          {
+            "@type": "Product",
+            "sku": "BDH02",
+            "name": "BenQ ERGO ARM 氣壓式雙臂螢幕支架 BDH02（白色）",
+            "color": "白色",
+            "image": "https://image.benq.com/is/image/benqco/02-bdh02-back45-a?$ResponsivePreset$&fmt=png-alpha"
+          }
         ]
       },
       {
@@ -100,6 +117,20 @@
           { "@type": "PropertyValue", "name": "適用螢幕尺寸", "minValue": 17, "maxValue": 40, "unitCode": "INH", "unitText": "吋" },
           { "@type": "PropertyValue", "name": "VESA 規格", "value": "75x75、100x100" },
           { "@type": "PropertyValue", "name": "支援螢幕數", "value": 1 }
+        ]
+      },
+      {
+        "@type": "Product",
+        "@id": "#arm-bdl",
+        "name": "BenQ ERGO ARM 氣壓式雙臂螢幕支架（輕量款）BDL01",
+        "sku": "BDL01",
+        "brand": { "@type": "Brand", "name": "BenQ" },
+        "image": "https://image.benq.com/is/image/benqco/04-bdl01-front45-a?$ResponsivePreset$&fmt=png-alpha",
+        "additionalProperty": [
+          { "@type": "PropertyValue", "name": "每個螢幕承重", "minValue": 2, "maxValue": 11, "unitCode": "KGM", "unitText": "kg" },
+          { "@type": "PropertyValue", "name": "每個螢幕適用尺寸", "minValue": 17, "maxValue": 35, "unitCode": "INH", "unitText": "吋" },
+          { "@type": "PropertyValue", "name": "VESA 規格", "value": "75x75、100x100" },
+          { "@type": "PropertyValue", "name": "支援螢幕數", "value": 2 }
         ]
       }
     ]
@@ -146,7 +177,7 @@
             <td>單螢幕</td>
           </tr>
           <tr>
-            <th scope="row" class="BNQARM01-table-model">BDH01</th>
+            <th scope="row" class="BNQARM01-table-model">BDH01、BDH02</th>
             <td>17 - 35 吋 (每螢幕)</td>
             <td>2 - 20 Kg (每螢幕)</td>
             <td>75x75 / 100x100</td>
@@ -158,6 +189,13 @@
             <td>2 - 11 Kg</td>
             <td>75x75 / 100x100</td>
             <td>單螢幕</td>
+          </tr>
+          <tr>
+            <th scope="row" class="BNQARM01-table-model">BDL01</th>
+            <td>17 - 35 吋 (每螢幕)</td>
+            <td>2 - 11 Kg (每螢幕)</td>
+            <td>75x75 / 100x100</td>
+            <td>雙螢幕</td>
           </tr>
         </tbody>
       </table>
@@ -237,7 +275,7 @@
         <p>本查詢工具需要啟用 JavaScript。您也可以依以下兩個條件自行判斷螢幕是否相容：</p>
         <ol>
           <li>螢幕背面孔位為 VESA 75x75 或 100x100。</li>
-          <li>螢幕重量在支架承重範圍內：BSL01 為 2 - 11 Kg，BSH01、BSH02 為 2 - 20 Kg，BDH01 每個螢幕為 2 - 20 Kg。</li>
+          <li>螢幕重量在支架承重範圍內：BSL01 為 2 - 11 Kg，BSH01、BSH02 為 2 - 20 Kg，BDH01、BDH02 每個螢幕為 2 - 20 Kg，BDL01 每個螢幕為 2 - 11 Kg。</li>
         </ol>
       </div>
     </noscript>
