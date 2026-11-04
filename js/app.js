@@ -737,48 +737,45 @@
 
   /**
    * Weight tier a monitor should lead with, keyed to product_group values
-   * in BenQArmSpec.csv. 8kg is the single cutover: BenQ's guidance is to
-   * steer heavier screens to BSH (2-20kg) before they get close to BSL's
-   * 11kg ceiling, and everything at or under 8kg is comfortably within
-   * BSL's (2-11kg) range, so one threshold covers both "under 6kg" and
-   * "6-8kg" from the product brief without a separate branch.
+   * in BenQArmSpec.csv. 4kg is the single cutover: only the lightest
+   * screens lead with BSL (2-11kg); anything heavier leads with BSH
+   * (2-20kg), the higher-end arm. Both arms still appear as cards whenever
+   * they pass the compatibility check.
    */
   var WEIGHT_TIER_PREFERENCE = [
-    { maxKg: 8, groupKey: "BSL" },
+    { maxKg: 4, groupKey: "BSL" },
     { maxKg: Infinity, groupKey: "BSH" }
   ];
 
   /**
-   * Short, factual selling point appended after the spec match, keyed by
-   * product_group so it stays in sync with which tier actually got
-   * recommended. Falls back to a neutral line for any group without a
-   * specific entry (e.g. if a dual-arm group is ever picked as lead).
+   * Short, factual selling point, written as a full sentence that follows
+   * the recommendation sentence. Keyed by product_group so it stays in sync
+   * with which tier actually got recommended. Falls back to a neutral line
+   * for any group without a specific entry (e.g. if a dual-arm group is
+   * ever picked as lead).
    */
   var GROUP_BENEFIT_COPY = {
-    BSL: "價格更親民，日常使用也輕巧好調整",
-    BSH: "支撐更穩固，長時間使用也不易下滑"
+    BSL: "這款價格更親民，日常使用也輕巧好調整。",
+    BSH: "這款承重與尺寸涵蓋範圍更廣，日後升級更大、更重的螢幕也能繼續使用。"
   };
-  var DEFAULT_BENEFIT_COPY = "安裝與調整都相當簡便";
+  var DEFAULT_BENEFIT_COPY = "這款安裝與調整都相當簡便。";
+
+  function isSingleGroup(group) {
+    return group.matched[0].armType === "single";
+  }
 
   /**
-   * Drafts the single-sentence recommendation shown above the cards. Only
-   * fires when the selected monitor has a known weight — CSV rows with a
-   * blank weight_kg (e.g. "-") can't be matched to a weight tier, so no
-   * summary is shown rather than guessing. Prefers the weight-tier arm
-   * (BSL under 8kg, BSH above) but only among groups that actually passed
-   * the compatibility check for this monitor; if the preferred tier didn't
-   * match (e.g. its size/VESA range excludes this screen), falls back to
-   * whichever compatible single-arm group has the smallest capacity that
-   * still fits, so the sentence never recommends something incompatible.
+   * Picks the group the summary recommends: the weight-tier arm when it is
+   * among the compatible groups, otherwise the single-arm group with the
+   * smallest capacity. Null when there is no weight to tier on or no
+   * single-arm group to recommend.
    */
-  function buildSummaryParts(monitor, groups) {
+  function pickLeadGroup(monitor, groups) {
     if (!monitor || monitor.weightKg == null || !groups.length) {
       return null;
     }
 
-    var singleGroups = groups.filter(function (g) {
-      return g.matched[0].armType === "single";
-    });
+    var singleGroups = groups.filter(isSingleGroup);
     if (!singleGroups.length) {
       return null;
     }
@@ -792,10 +789,53 @@
     })[0];
 
     if (!lead) {
-      singleGroups.sort(function (a, b) {
+      lead = singleGroups.slice().sort(function (a, b) {
         return a.matched[0].weightMax - b.matched[0].weightMax;
+      })[0];
+    }
+    return lead;
+  }
+
+  /**
+   * Card order: the summary's recommended group first, then the other
+   * single-arm groups, then dual-arm groups last. Within each tier the
+   * CSV order is kept.
+   */
+  function sortGroups(monitor, groups) {
+    var lead = pickLeadGroup(monitor, groups);
+    function rank(group) {
+      if (group === lead) {
+        return 0;
+      }
+      return isSingleGroup(group) ? 1 : 2;
+    }
+    return groups
+      .map(function (group, index) {
+        return { group: group, index: index };
+      })
+      .sort(function (a, b) {
+        return rank(a.group) - rank(b.group) || a.index - b.index;
+      })
+      .map(function (item) {
+        return item.group;
       });
-      lead = singleGroups[0];
+  }
+
+  /**
+   * Drafts the single-sentence recommendation shown above the cards. Only
+   * fires when the selected monitor has a known weight — CSV rows with a
+   * blank weight_kg (e.g. "-") can't be matched to a weight tier, so no
+   * summary is shown rather than guessing. Prefers the weight-tier arm
+   * (BSL up to 4kg, BSH above) but only among groups that actually passed
+   * the compatibility check for this monitor; if the preferred tier didn't
+   * match (e.g. its size/VESA range excludes this screen), falls back to
+   * whichever compatible single-arm group has the smallest capacity that
+   * still fits, so the sentence never recommends something incompatible.
+   */
+  function buildSummaryParts(monitor, groups) {
+    var lead = pickLeadGroup(monitor, groups);
+    if (!lead) {
+      return null;
     }
 
     var arm = lead.matched[0];
@@ -809,20 +849,19 @@
           formatWeight(monitor.weightRaw) +
           "，建議優先選擇 "
       },
-      { text: lead.title, strong: true },
+      { text: lead.title.replace(/\s*\|\s*/, " "), strong: true },
       {
         text:
-          "，承重範圍 " +
+          "（承重 " +
           arm.weightMin +
           "–" +
           arm.weightMax +
-          " Kg、適用尺寸 " +
+          " Kg、適用 " +
           arm.sizeMinInch +
           "–" +
           arm.sizeMaxInch +
-          " 吋，符合您的螢幕規格，且" +
-          benefit +
-          "。"
+          " 吋）。" +
+          benefit
       }
     ];
   }
@@ -909,7 +948,7 @@
         var arms = recommendedArms(monitors);
         if (arms.length) {
           renderNoMatch("");
-          var groups = groupArms(arms);
+          var groups = sortGroups(monitors[0], groupArms(arms));
           renderRecommendations(groups);
           renderRecommendSummary(monitors[0], groups);
           announce(
