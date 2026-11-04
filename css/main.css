@@ -558,6 +558,24 @@ button.BNQARM01-model-name:focus-visible {
   list-style: none;
 }
 
+.BNQARM01-recommend[hidden],
+.BNQARM01-recommend-dual-hint[hidden] {
+  display: none !important;
+}
+
+.BNQARM01-recommend-dual-hint {
+  width: 100%;
+  margin: 32px 0 0;
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 28.8px;
+  color: #333333;
+}
+
+.BNQARM01-recommend-dual {
+  padding-top: 16px;
+}
+
 .BNQARM01-card {
   display: flex;
   flex: 1 1 0;
@@ -794,6 +812,12 @@ button.BNQARM01-model-name:focus-visible {
     gap: 20px;
   }
 
+  .BNQARM01-recommend-dual-hint {
+    margin-top: 24px;
+    font-size: 16px;
+    line-height: 25.6px;
+  }
+
   .BNQARM01-card {
     max-width: 100%;
   }
@@ -934,6 +958,11 @@ button.BNQARM01-model-name:focus-visible {
     padding-bottom: 96px;
     padding-left: var(--BNQARM01-side-pad);
     padding-right: var(--BNQARM01-side-pad);
+  }
+
+  /* At most two cards per row, so a lone card keeps the same width. */
+  .BNQARM01-recommend > .BNQARM01-card {
+    flex: 0 1 calc((100% - 32px) / 2);
   }
 }
 

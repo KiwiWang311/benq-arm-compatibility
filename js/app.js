@@ -678,22 +678,51 @@
     return a;
   }
 
+  /**
+   * Single-arm cards fill the main row. Dual-arm cards get their own row
+   * under a "if you use two screens" line, and that row is hidden when no
+   * dual arm fits. With no single arm to lead, the dual cards take the main
+   * row instead and the line is dropped.
+   */
   function renderRecommendations(groups) {
     var wrap = byId(PREFIX + "-recommend");
+    var dualWrap = byId(PREFIX + "-recommend-dual");
+    var dualHint = byId(PREFIX + "-recommend-dual-hint");
     var title = byId(PREFIX + "-recommend-title");
     var section = byId(PREFIX + "-recommend-section");
     if (!wrap) {
       return;
     }
-    while (wrap.firstChild) {
-      wrap.removeChild(wrap.firstChild);
-    }
+
+    var singles = groups.filter(isSingleGroup);
+    var duals = groups.filter(function (group) {
+      return !isSingleGroup(group);
+    });
+    var main = singles.length ? singles : duals;
+    var extra = singles.length ? duals : [];
 
     if (title) {
       title.hidden = !groups.length;
     }
     if (section) {
       section.hidden = !groups.length;
+    }
+    if (dualWrap) {
+      dualWrap.hidden = !extra.length;
+    }
+    if (dualHint) {
+      dualHint.hidden = !extra.length;
+    }
+
+    fillCards(wrap, main);
+    if (dualWrap) {
+      fillCards(dualWrap, extra);
+    }
+  }
+
+  function fillCards(wrap, groups) {
+    while (wrap.firstChild) {
+      wrap.removeChild(wrap.firstChild);
     }
 
     groups.forEach(function (group) {
@@ -743,8 +772,8 @@
    * they pass the compatibility check.
    */
   var WEIGHT_TIER_PREFERENCE = [
-    { maxKg: 4, groupKey: "BSL" },
-    { maxKg: Infinity, groupKey: "BSH" }
+    { maxKg: 4, groupKey: "BSL", dualGroupKey: "BDL" },
+    { maxKg: Infinity, groupKey: "BSH", dualGroupKey: "BDH" }
   ];
 
   /**
@@ -770,8 +799,18 @@
    * smallest capacity. Null when there is no weight to tier on or no
    * single-arm group to recommend.
    */
+  function weightTier(monitor) {
+    if (!monitor || monitor.weightKg == null) {
+      return null;
+    }
+    return WEIGHT_TIER_PREFERENCE.filter(function (tier) {
+      return monitor.weightKg <= tier.maxKg;
+    })[0];
+  }
+
   function pickLeadGroup(monitor, groups) {
-    if (!monitor || monitor.weightKg == null || !groups.length) {
+    var tier = weightTier(monitor);
+    if (!tier || !groups.length) {
       return null;
     }
 
@@ -780,12 +819,8 @@
       return null;
     }
 
-    var preferredKey = WEIGHT_TIER_PREFERENCE.filter(function (tier) {
-      return monitor.weightKg <= tier.maxKg;
-    })[0].groupKey;
-
     var lead = singleGroups.filter(function (g) {
-      return g.key === preferredKey;
+      return g.key === tier.groupKey;
     })[0];
 
     if (!lead) {
@@ -798,16 +833,21 @@
 
   /**
    * Card order: the summary's recommended group first, then the other
-   * single-arm groups, then dual-arm groups last. Within each tier the
+   * single-arm groups, then dual-arm groups last, with the dual arm that
+   * matches the same weight tier ahead of the other. Within each rank the
    * CSV order is kept.
    */
   function sortGroups(monitor, groups) {
     var lead = pickLeadGroup(monitor, groups);
+    var tier = weightTier(monitor);
     function rank(group) {
       if (group === lead) {
         return 0;
       }
-      return isSingleGroup(group) ? 1 : 2;
+      if (isSingleGroup(group)) {
+        return 1;
+      }
+      return tier && group.key === tier.dualGroupKey ? 2 : 3;
     }
     return groups
       .map(function (group, index) {
